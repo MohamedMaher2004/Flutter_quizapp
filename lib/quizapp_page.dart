@@ -12,8 +12,11 @@ class QuizappPage extends StatefulWidget {
 
 class _QuizappPageState extends State<QuizappPage> {
   var index = 0;
+  int score = 0;
   Answer? selectedanswer;
   bool isselected = false;
+  bool isnext = false;
+  bool islastquestion = false;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +51,7 @@ class _QuizappPageState extends State<QuizappPage> {
                       color: Colors.white),
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height / 6,
-                  child: Center(child: Text(questions[0].question)),
+                  child: Center(child: Text(questions[index].question)),
                 ),
                 Positioned(
                     top: -25,
@@ -78,6 +81,7 @@ class _QuizappPageState extends State<QuizappPage> {
               ],
             ),
             for (var ans in questions[index].answers) getbuttons(ans),
+            GetNextButton(),
           ],
         ),
       ),
@@ -91,16 +95,77 @@ class _QuizappPageState extends State<QuizappPage> {
       child: InkWell(
         onTap: () {
           setState(() {
+            isnext = true;
             selectedanswer = ans;
           });
         },
         child: Container(
-          width: 200,
+          width: 150,
           height: 30,
           decoration: BoxDecoration(
               color: isselected ? Colors.green : Colors.white,
               borderRadius: BorderRadius.circular(20)),
           child: Center(child: Text('${ans.answer}')),
+        ),
+      ),
+    );
+  }
+
+  GetNextButton() {
+    return GestureDetector(
+      onTap: isnext
+          ? () {
+              if (index == questions.length - 1) {
+                setState(() {
+                  islastquestion = true;
+                  showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (Builder) {
+                        return AlertDialog(
+                          title: score > (questions.length * .6)
+                              ? Text('Pass')
+                              : Text('Failed'),
+                          content: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                index = 0;
+                                selectedanswer = null;
+                                score = 0;
+                                isnext = false;
+                                isselected = false;
+                                Navigator.pop(context);
+                              });
+                            },
+                            child: Text('Reset'),
+                          ),
+                        );
+                      });
+                });
+              } else {
+                if (selectedanswer!.isTrue == true) {
+                  score++;
+                }
+                setState(() {
+                  index++;
+                  selectedanswer = null;
+                  islastquestion = false;
+                  isselected = false;
+                  isnext = false;
+                });
+              }
+            }
+          : null,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 20),
+        child: Container(
+          width: 150,
+          height: 30,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.zero, color: Colors.white),
+          child: islastquestion
+              ? Center(child: Text('Submit'))
+              : Center(child: Text('Next')),
         ),
       ),
     );
