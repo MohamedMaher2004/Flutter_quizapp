@@ -12,6 +12,7 @@ class QuizappPage extends StatefulWidget {
 
 class _QuizappPageState extends State<QuizappPage> {
   var index = 0;
+  Answer? selectedanswer;
   bool isselected = false;
 
   @override
@@ -84,15 +85,21 @@ class _QuizappPageState extends State<QuizappPage> {
   }
 
   getbuttons(Answer ans) {
+    isselected = ans == selectedanswer;
     return Padding(
       padding: const EdgeInsets.only(top: 20),
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          setState(() {
+            selectedanswer = ans;
+          });
+        },
         child: Container(
           width: 200,
           height: 30,
           decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(20)),
+              color: isselected ? Colors.green : Colors.white,
+              borderRadius: BorderRadius.circular(20)),
           child: Center(child: Text('${ans.answer}')),
         ),
       ),
